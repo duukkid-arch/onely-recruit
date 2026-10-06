@@ -1,0 +1,752 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Onely Recruit — Operator Recruitment Platform</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<style>
+:root{
+  --bg:#f5f6fa;--surface:#fff;--sidebar:#0c0f1a;--sidebar-hover:#171b2d;
+  --text:#1a1d2e;--text2:#5f6580;--text3:#9196b0;
+  --border:#e4e7f1;--accent:#635bff;--accent2:#8b83ff;--accent-bg:#f0eeff;
+  --green:#00c48c;--green-bg:#e6faf3;--yellow:#ffb020;--yellow-bg:#fff8e6;
+  --red:#ff4757;--red-bg:#fff0f1;--blue:#2f80ed;--blue-bg:#eaf2fd;
+  --orange:#ff7b47;--orange-bg:#fff3ee;
+  --r:10px;--sh:0 1px 4px rgba(0,0,0,.05);
+}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#0d0f18;--surface:#161929;--sidebar:#080a12;--sidebar-hover:#161929;
+  --text:#e0e3f0;--text2:#8b90a8;--text3:#5a5f78;
+  --border:#252940;--accent-bg:#1c1a3a;
+  --green-bg:#0a2e22;--yellow-bg:#2e2510;--red-bg:#2e1015;--blue-bg:#0f1e30;--orange-bg:#2e1a0f;
+}}
+:root[data-theme="dark"]{
+  --bg:#0d0f18;--surface:#161929;--sidebar:#080a12;--sidebar-hover:#161929;
+  --text:#e0e3f0;--text2:#8b90a8;--text3:#5a5f78;
+  --border:#252940;--accent-bg:#1c1a3a;
+  --green-bg:#0a2e22;--yellow-bg:#2e2510;--red-bg:#2e1015;--blue-bg:#0f1e30;--orange-bg:#2e1a0f;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-padding-top:env(safe-area-inset-top,0)}
+body{font-family:'Inter',system-ui,sans-serif;background:var(--bg);color:var(--text);display:flex;min-height:100vh;line-height:1.5;
+  padding-top:env(safe-area-inset-top,0);padding-bottom:env(safe-area-inset-bottom,0)}
+::selection{background:var(--accent);color:#fff}
+
+/* Sidebar */
+.sb{width:230px;background:var(--sidebar);display:flex;flex-direction:column;position:fixed;top:0;left:0;bottom:0;z-index:10;
+  padding-top:env(safe-area-inset-top,0)}
+.sb-logo{padding:24px 22px 30px;display:flex;align-items:center;gap:10px}
+.sb-logo svg{width:28px;height:28px}
+.sb-logo span{font-size:17px;font-weight:700;color:#fff;letter-spacing:-.3px}
+.sb-logo em{font-style:normal;color:var(--accent2);font-weight:400;margin-left:2px}
+.sb nav{flex:1}
+.sb nav a{display:flex;align-items:center;gap:11px;padding:11px 22px;color:#7a7f9a;font-size:13.5px;font-weight:500;
+  text-decoration:none;transition:all .15s;border-left:3px solid transparent}
+.sb nav a:hover{background:var(--sidebar-hover);color:#c8cce0}
+.sb nav a.on{background:var(--sidebar-hover);color:#fff;border-left-color:var(--accent)}
+.sb nav a svg{width:18px;height:18px;flex-shrink:0;opacity:.7}
+.sb nav a.on svg{opacity:1}
+.sb-foot{padding:18px 22px;border-top:1px solid #1e2236}
+.sb-foot .target-ring{display:flex;align-items:center;gap:14px}
+.sb-foot .ring-wrap{position:relative;width:52px;height:52px;flex-shrink:0}
+.sb-foot .ring-wrap svg{transform:rotate(-90deg)}
+.sb-foot .ring-num{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
+  font-size:14px;font-weight:800;color:#fff}
+.sb-foot .ring-label{font-size:11px;color:#5a5f78;line-height:1.4}
+.sb-foot .ring-label strong{display:block;color:#c8cce0;font-size:13px}
+
+/* Main */
+.mn{margin-left:230px;flex:1;padding:28px 34px;max-width:1200px}
+.pg{display:none}.pg.on{display:block}
+
+.pg-hd{margin-bottom:22px;display:flex;justify-content:space-between;align-items:flex-start;gap:16px;flex-wrap:wrap}
+.pg-hd h1{font-size:21px;font-weight:700;letter-spacing:-.3px}
+.pg-hd p{color:var(--text2);font-size:13.5px;margin-top:3px}
+
+/* Metrics */
+.metrics{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:22px}
+.mc{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:18px 20px;box-shadow:var(--sh);position:relative;overflow:hidden}
+.mc::after{content:'';position:absolute;top:0;left:0;width:4px;height:100%;border-radius:4px 0 0 4px}
+.mc.mc-blue::after{background:var(--blue)}.mc.mc-orange::after{background:var(--orange)}
+.mc.mc-yellow::after{background:var(--yellow)}.mc.mc-green::after{background:var(--green)}
+.mc .mc-l{font-size:12px;color:var(--text2);font-weight:500;margin-bottom:6px}
+.mc .mc-v{font-size:26px;font-weight:800;letter-spacing:-.5px}
+.mc .mc-s{font-size:11.5px;margin-top:4px;font-weight:500;color:var(--text3)}
+
+/* Cards */
+.cd{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);box-shadow:var(--sh)}
+.cd-h{padding:14px 20px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center}
+.cd-h h3{font-size:13.5px;font-weight:600}
+.cd-b{padding:20px}
+
+/* Buttons */
+.btn{display:inline-flex;align-items:center;gap:6px;padding:7px 15px;border-radius:8px;font-size:12.5px;
+  font-weight:500;border:none;cursor:pointer;transition:all .12s;font-family:inherit;white-space:nowrap}
+.btn-p{background:var(--accent);color:#fff}.btn-p:hover{background:#5248e0}
+.btn-o{background:transparent;border:1px solid var(--border);color:var(--text)}.btn-o:hover{background:var(--bg)}
+.btn-s{padding:5px 10px;font-size:11.5px}
+.btn-g{background:var(--green);color:#fff}.btn-g:hover{opacity:.9}
+.btn-d{background:var(--red);color:#fff}.btn-d:hover{opacity:.9}
+.btn-ai{background:linear-gradient(135deg,#635bff,#8b83ff);color:#fff;position:relative;overflow:hidden}
+.btn-ai:hover{opacity:.92}
+.btn-ai::before{content:'✦';margin-right:4px}
+
+/* Badges */
+.bg{display:inline-block;padding:2px 8px;border-radius:6px;font-size:11px;font-weight:600}
+.bg-a{background:var(--green-bg);color:var(--green)}.bg-b{background:var(--blue-bg);color:var(--blue)}
+.bg-c{background:var(--yellow-bg);color:var(--yellow)}.bg-d{background:var(--red-bg);color:var(--red)}
+.bg-st{padding:3px 9px;border-radius:20px;font-size:10.5px;font-weight:600;letter-spacing:.2px}
+.bg-new{background:var(--bg);color:var(--text3);border:1px solid var(--border)}
+.bg-contacted{background:var(--blue-bg);color:var(--blue)}
+.bg-responded{background:var(--yellow-bg);color:var(--yellow)}
+.bg-interested{background:var(--orange-bg);color:var(--orange)}
+.bg-onboarding{background:var(--accent-bg);color:var(--accent)}
+.bg-onboarded{background:var(--green-bg);color:var(--green)}
+
+/* Table */
+table{width:100%;border-collapse:collapse;font-size:13px}
+th{text-align:left;padding:10px 12px;font-weight:600;color:var(--text2);font-size:11.5px;
+  border-bottom:2px solid var(--border);white-space:nowrap}
+td{padding:10px 12px;border-bottom:1px solid var(--border);vertical-align:middle}
+tr:hover td{background:var(--bg)}
+.t-name{font-weight:600;font-size:13px}.t-email{color:var(--text2);font-size:11.5px}
+
+/* Toolbar */
+.tb{display:flex;gap:10px;margin-bottom:14px;flex-wrap:wrap;align-items:center}
+.tb input[type=text],.tb select{padding:7px 12px;border:1px solid var(--border);border-radius:8px;font-size:12.5px;
+  background:var(--surface);color:var(--text);font-family:inherit}
+.tb input[type=text]{width:220px}
+
+/* Charts row */
+.ch-row{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:22px}
+
+/* Funnel */
+.fn{display:flex;flex-direction:column;gap:7px}
+.fn-s{display:flex;align-items:center;gap:10px}
+.fn-s .fn-l{width:90px;font-size:11.5px;font-weight:500;text-align:right;color:var(--text2)}
+.fn-s .fn-bw{flex:1;height:26px;background:var(--bg);border-radius:6px;overflow:hidden}
+.fn-s .fn-b{height:100%;border-radius:6px;display:flex;align-items:center;padding-left:10px;
+  font-size:11px;font-weight:700;color:#fff;transition:width .5s ease;min-width:32px}
+
+/* Pipeline */
+.pp-cols{display:grid;grid-template-columns:repeat(6,1fr);gap:10px}
+.pp-col{background:var(--bg);border-radius:var(--r);padding:10px;min-height:260px}
+.pp-col-h{font-size:11.5px;font-weight:600;color:var(--text2);margin-bottom:8px;display:flex;
+  justify-content:space-between;align-items:center}
+.pp-col-h .cnt{background:var(--surface);border:1px solid var(--border);padding:1px 7px;border-radius:10px;font-size:10.5px}
+.pp-cd{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:10px 12px;
+  margin-bottom:7px;cursor:pointer;transition:all .12s}
+.pp-cd:hover{box-shadow:0 3px 12px rgba(0,0,0,.07);transform:translateY(-1px)}
+.pp-cd .pp-n{font-size:12.5px;font-weight:600;margin-bottom:2px}
+.pp-cd .pp-m{font-size:10.5px;color:var(--text2)}
+.pp-cd .pp-a{margin-top:7px;display:flex;gap:4px}
+
+/* Outreach */
+.ou-lay{display:grid;grid-template-columns:280px 1fr;gap:18px}
+.lp{max-height:460px;overflow-y:auto}
+.lp-i{padding:10px 14px;border-bottom:1px solid var(--border);cursor:pointer;transition:background .1s}
+.lp-i:hover,.lp-i.sel{background:var(--accent-bg)}
+.lp-i .lp-n{font-size:12.5px;font-weight:500}.lp-i .lp-s{font-size:11px;color:var(--text2)}
+.msg-box{background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:18px;
+  font-size:13px;line-height:1.75;white-space:pre-wrap;min-height:220px;max-height:400px;overflow-y:auto}
+.msg-box.loading{color:var(--accent);font-style:italic}
+.ou-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:16px}
+.ou-st{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:16px;text-align:center}
+.ou-st .sv{font-size:22px;font-weight:800;color:var(--accent)}.ou-st .sl{font-size:11.5px;color:var(--text2);margin-top:2px}
+
+/* Community */
+.cm-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.cm-ch{display:flex;align-items:center;gap:10px;padding:12px;border-radius:8px;border:1px solid var(--border);margin-bottom:8px}
+.cm-ch .cm-icon{width:36px;height:36px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:16px}
+.cm-ch .cm-icon.discord{background:#5865f2;color:#fff}.cm-ch .cm-icon.tg{background:#229ED9;color:#fff}
+.cm-ch .cm-info{flex:1}.cm-ch .cm-info .ch-name{font-size:12.5px;font-weight:600}
+.cm-ch .cm-info .ch-desc{font-size:11px;color:var(--text2)}
+.cm-ch .ch-count{font-size:13px;font-weight:700;color:var(--accent)}
+
+/* Activity feed */
+.feed{max-height:300px;overflow-y:auto}
+.feed-i{display:flex;gap:10px;padding:8px 0;border-bottom:1px solid var(--border);font-size:12.5px}
+.feed-i:last-child{border:none}
+.feed-dot{width:8px;height:8px;border-radius:50%;margin-top:5px;flex-shrink:0}
+.feed-i .feed-t{color:var(--text2);font-size:11px;margin-top:2px}
+
+/* Modal */
+.mo{position:fixed;inset:0;background:rgba(0,0,0,.45);display:flex;align-items:center;justify-content:center;z-index:100;
+  opacity:0;pointer-events:none;transition:opacity .2s}
+.mo.show{opacity:1;pointer-events:auto}
+.mo-box{background:var(--surface);border-radius:14px;width:520px;max-width:92vw;max-height:82vh;overflow-y:auto;
+  box-shadow:0 24px 60px rgba(0,0,0,.25);transform:scale(.96);transition:transform .2s}
+.mo.show .mo-box{transform:scale(1)}
+.mo-h{padding:16px 22px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center}
+.mo-h h3{font-size:15px;font-weight:600}
+.mo-x{background:none;border:none;font-size:20px;cursor:pointer;color:var(--text3);padding:4px 8px;border-radius:6px}
+.mo-x:hover{background:var(--bg)}
+.mo-b{padding:20px 22px}
+.mo-b label{display:block;font-size:11.5px;font-weight:600;color:var(--text2);margin-bottom:4px;margin-top:14px}
+.mo-b label:first-child{margin-top:0}
+.mo-b input,.mo-b select,.mo-b textarea{width:100%;padding:8px 12px;border:1px solid var(--border);border-radius:8px;
+  font-size:13px;background:var(--surface);color:var(--text);font-family:inherit}
+.mo-b textarea{min-height:70px;resize:vertical}
+.mo-f{padding:12px 22px;border-top:1px solid var(--border);display:flex;justify-content:flex-end;gap:8px}
+
+/* Toast */
+.toast{position:fixed;top:24px;right:24px;background:var(--surface);border:1px solid var(--border);border-radius:12px;
+  padding:12px 22px;box-shadow:0 10px 40px rgba(0,0,0,.14);z-index:200;font-size:13px;font-weight:500;
+  transform:translateY(-20px);opacity:0;transition:all .25s;pointer-events:none;max-width:340px}
+.toast.show{transform:translateY(0);opacity:1}
+.toast.t-ok{border-left:4px solid var(--green)}.toast.t-err{border-left:4px solid var(--red)}
+
+/* Checkbox */
+.ck{width:16px;height:16px;accent-color:var(--accent);cursor:pointer}
+
+input[type=file]{display:none}
+
+@media(max-width:960px){
+  .sb{width:56px;overflow:hidden}.sb-logo em,.sb nav a span,.sb-foot .ring-label{display:none}
+  .sb-logo{padding:20px 14px}.sb nav a{padding:12px 18px;justify-content:center}
+  .sb-foot{padding:12px;display:flex;justify-content:center}.sb-foot .ring-wrap{width:40px;height:40px}
+  .mn{margin-left:56px;padding:16px}
+  .metrics{grid-template-columns:repeat(2,1fr)}.ch-row{grid-template-columns:1fr}
+  .pp-cols{grid-template-columns:repeat(2,1fr)}.ou-lay{grid-template-columns:1fr}
+  .cm-grid{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+
+<div class="sb">
+  <div class="sb-logo">
+    <svg viewBox="0 0 28 28" fill="none"><circle cx="14" cy="14" r="12" stroke="#635bff" stroke-width="2.5"/>
+    <circle cx="14" cy="14" r="5" fill="#635bff"/></svg>
+    <span>Onely<em>Recruit</em></span>
+  </div>
+  <nav>
+    <a href="#" data-pg="dashboard" class="on"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg><span>Dashboard</span></a>
+    <a href="#" data-pg="leads"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 00-4-4H6a4 4 0 00-4-4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg><span>Leads</span></a>
+    <a href="#" data-pg="outreach"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg><span>Outreach</span></a>
+    <a href="#" data-pg="pipeline"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg><span>Pipeline</span></a>
+    <a href="#" data-pg="community"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4-4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-4-4h-1"/><circle cx="19" cy="7" r="3"/></svg><span>Community</span></a>
+  </nav>
+  <div class="sb-foot">
+    <div class="target-ring">
+      <div class="ring-wrap">
+        <svg viewBox="0 0 52 52" width="52" height="52">
+          <circle cx="26" cy="26" r="22" fill="none" stroke="#252940" stroke-width="5"/>
+          <circle id="prog-ring" cx="26" cy="26" r="22" fill="none" stroke="var(--accent)" stroke-width="5"
+            stroke-dasharray="138.23" stroke-dashoffset="138.23" stroke-linecap="round"/>
+        </svg>
+        <div class="ring-num" id="prog-num">0</div>
+      </div>
+      <div class="ring-label"><strong>Target: 100</strong>Operators onboarded</div>
+    </div>
+  </div>
+</div>
+
+<div class="mn">
+  <!-- DASHBOARD -->
+  <div class="pg on" id="pg-dashboard">
+    <div class="pg-hd"><div><h1>Recruitment Dashboard</h1><p>3-day sprint — recruit 100 social media operators</p></div>
+      <button class="btn btn-o" onclick="exportCSV()">Export CSV</button></div>
+    <div class="metrics" id="d-metrics"></div>
+    <div class="ch-row">
+      <div class="cd"><div class="cd-h"><h3>Conversion Funnel</h3></div><div class="cd-b" id="d-funnel"></div></div>
+      <div class="cd"><div class="cd-h"><h3>Recent Activity</h3></div><div class="cd-b feed" id="d-feed"></div></div>
+    </div>
+    <div class="ch-row">
+      <div class="cd"><div class="cd-h"><h3>Lead Sources</h3></div><div class="cd-b"><canvas id="ch-src" height="200"></canvas></div></div>
+      <div class="cd"><div class="cd-h"><h3>Grade × Region</h3></div><div class="cd-b"><canvas id="ch-gr" height="200"></canvas></div></div>
+    </div>
+  </div>
+
+  <!-- LEADS -->
+  <div class="pg" id="pg-leads">
+    <div class="pg-hd">
+      <div><h1>Lead Management</h1><p>Import, deduplicate, grade, and manage operator leads</p></div>
+      <div style="display:flex;gap:8px">
+        <button class="btn btn-o" onclick="document.getElementById('csv-in').click()">Import CSV</button>
+        <button class="btn btn-p" onclick="openAddModal()">Add Lead</button>
+        <input type="file" id="csv-in" accept=".csv" onchange="handleCSV(event)">
+      </div>
+    </div>
+    <div class="tb">
+      <input type="text" placeholder="Search name or email…" oninput="filterL()" id="l-search">
+      <select onchange="filterL()" id="f-grade"><option value="">All Grades</option><option>A</option><option>B</option><option>C</option><option>D</option></select>
+      <select onchange="filterL()" id="f-src"><option value="">All Sources</option><option>Upwork</option><option>LinkedIn</option><option>OnlineJobs.ph</option><option>Facebook Group</option><option>Freelancer</option><option>Referral</option></select>
+      <select onchange="filterL()" id="f-st"><option value="">All Status</option><option>New</option><option>Contacted</option><option>Responded</option><option>Interested</option><option>Onboarding</option><option>Onboarded</option></select>
+      <div style="margin-left:auto;display:flex;gap:8px;align-items:center">
+        <span id="l-cnt" style="font-size:12px;color:var(--text2)"></span>
+        <button class="btn btn-s btn-o" id="batch-btn" style="display:none" onclick="openBatch()">Batch Update</button>
+      </div>
+    </div>
+    <div class="cd"><div style="overflow-x:auto">
+      <table><thead><tr>
+        <th style="width:30px"><input type="checkbox" class="ck" id="ck-all" onchange="toggleAll()"></th>
+        <th>Name / Email</th><th>Location</th><th>Platforms</th><th>Exp</th><th>English</th><th>Grade</th><th>Status</th><th>Source</th><th style="width:70px"></th>
+      </tr></thead><tbody id="l-tbody"></tbody></table>
+    </div></div>
+  </div>
+
+  <!-- OUTREACH -->
+  <div class="pg" id="pg-outreach">
+    <div class="pg-hd"><div><h1>Outreach Center</h1><p>Generate personalized recruitment messages — AI-powered or template-based</p></div></div>
+    <div class="tb">
+      <select id="ou-ch" onchange="renderOuMsg()"><option value="linkedin">LinkedIn DM</option><option value="email">Email</option><option value="discord">Discord</option><option value="telegram">Telegram</option></select>
+      <select id="ou-tone" onchange="renderOuMsg()"><option value="professional">Professional</option><option value="friendly">Friendly</option><option value="urgent">Urgent Hiring</option></select>
+      <button class="btn btn-ai" id="ai-btn" onclick="aiGenerate()" style="display:none">AI Generate</button>
+    </div>
+    <div class="ou-lay">
+      <div class="cd"><div class="cd-h"><h3>Select Lead</h3></div><div class="lp" id="ou-lp"></div></div>
+      <div>
+        <div class="cd" style="margin-bottom:14px">
+          <div class="cd-h"><h3>Message Preview</h3>
+            <div style="display:flex;gap:6px">
+              <button class="btn btn-s btn-o" onclick="copyMsg()">Copy</button>
+              <button class="btn btn-s btn-g" onclick="markSent()">Send & Track</button>
+            </div>
+          </div>
+          <div class="cd-b"><div class="msg-box" id="ou-msg">Select a lead to generate a personalized outreach message.</div></div>
+        </div>
+        <div class="ou-stats">
+          <div class="ou-st"><div class="sv" id="s-sent">0</div><div class="sl">Sent</div></div>
+          <div class="ou-st"><div class="sv" id="s-rep">0</div><div class="sl">Replies</div></div>
+          <div class="ou-st"><div class="sv" id="s-rate">0%</div><div class="sl">Response Rate</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PIPELINE -->
+  <div class="pg" id="pg-pipeline">
+    <div class="pg-hd"><div><h1>Recruitment Pipeline</h1><p>Track each lead from discovery to onboarding</p></div></div>
+    <div class="pp-cols" id="pp-board"></div>
+  </div>
+
+  <!-- COMMUNITY -->
+  <div class="pg" id="pg-community">
+    <div class="pg-hd"><div><h1>Community Management</h1><p>Manage onboarded operators via Discord & Telegram</p></div></div>
+    <div class="cm-grid">
+      <div>
+        <div class="cd" style="margin-bottom:14px">
+          <div class="cd-h"><h3>Discord Server — Onely Operators</h3></div>
+          <div class="cd-b" id="cm-discord"></div>
+        </div>
+        <div class="cd">
+          <div class="cd-h"><h3>Training Progress</h3></div>
+          <div class="cd-b" id="cm-training"></div>
+        </div>
+      </div>
+      <div>
+        <div class="cd" style="margin-bottom:14px">
+          <div class="cd-h"><h3>Telegram Groups</h3></div>
+          <div class="cd-b" id="cm-tg"></div>
+        </div>
+        <div class="cd">
+          <div class="cd-h"><h3>Retention & Engagement</h3></div>
+          <div class="cd-b" id="cm-retention"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Add Modal -->
+<div class="mo" id="mo-add"><div class="mo-box">
+  <div class="mo-h"><h3>Add New Lead</h3><button class="mo-x" onclick="closeMo('mo-add')">&times;</button></div>
+  <div class="mo-b">
+    <label>Full Name</label><input id="f-name" placeholder="e.g. Maria Santos">
+    <label>Email</label><input id="f-email" type="email" placeholder="e.g. maria@gmail.com">
+    <label>Country</label><select id="f-country"><option>Philippines</option><option>Nigeria</option><option>Kenya</option><option>South Africa</option><option>India</option><option>Pakistan</option><option>Ghana</option><option>Other</option></select>
+    <label>City</label><input id="f-city" placeholder="e.g. Manila">
+    <label>Platforms (comma-separated)</label><input id="f-plat" placeholder="e.g. Instagram, TikTok, YouTube">
+    <label>Years of Experience</label><input id="f-exp" type="number" min="0" max="20" value="1">
+    <label>English Proficiency</label><select id="f-eng"><option>Fluent</option><option>Native</option><option>Good</option><option>Basic</option></select>
+    <label>Hourly Rate (USD)</label><input id="f-rate" type="number" min="0" value="5">
+    <label>Source</label><select id="f-source"><option>Upwork</option><option>LinkedIn</option><option>OnlineJobs.ph</option><option>Facebook Group</option><option>Freelancer</option><option>Referral</option></select>
+    <label>Notes</label><textarea id="f-notes" placeholder="Additional context…"></textarea>
+  </div>
+  <div class="mo-f"><button class="btn btn-o" onclick="closeMo('mo-add')">Cancel</button><button class="btn btn-p" onclick="addLead()">Add Lead</button></div>
+</div></div>
+
+<!-- Detail Modal -->
+<div class="mo" id="mo-det"><div class="mo-box">
+  <div class="mo-h"><h3 id="det-title">Lead Details</h3><button class="mo-x" onclick="closeMo('mo-det')">&times;</button></div>
+  <div class="mo-b" id="det-body"></div>
+  <div class="mo-f" id="det-foot"></div>
+</div></div>
+
+<!-- Batch Modal -->
+<div class="mo" id="mo-batch"><div class="mo-box">
+  <div class="mo-h"><h3>Batch Update</h3><button class="mo-x" onclick="closeMo('mo-batch')">&times;</button></div>
+  <div class="mo-b">
+    <p style="font-size:13px;color:var(--text2);margin-bottom:14px">Update <strong id="batch-cnt">0</strong> selected leads:</p>
+    <label>Move to Status</label>
+    <select id="batch-st"><option value="">— Don't change —</option><option>New</option><option>Contacted</option><option>Responded</option><option>Interested</option><option>Onboarding</option><option>Onboarded</option></select>
+  </div>
+  <div class="mo-f"><button class="btn btn-o" onclick="closeMo('mo-batch')">Cancel</button><button class="btn btn-p" onclick="doBatch()">Update</button></div>
+</div></div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const ST=['New','Contacted','Responded','Interested','Onboarding','Onboarded'];
+const ST_C={New:'#9196b0',Contacted:'#2f80ed',Responded:'#ffb020',Interested:'#ff7b47',Onboarding:'#635bff',Onboarded:'#00c48c'};
+let leads=[],feed=[],selected=new Set(),sampleFn=null;
+
+function gid(){return Date.now().toString(36)+Math.random().toString(36).slice(2,7)}
+function esc(s){const d=document.createElement('div');d.textContent=s||'';return d.innerHTML}
+function grade(l){
+  let s=0;
+  s+=l.experience>=3?30:l.experience>=1?20:5;
+  const np=(l.platforms||[]).length;
+  s+=np>=4?25:np>=2?15:np>=1?8:0;
+  s+=({Native:25,Fluent:20,Good:12,Basic:4})[l.english]||4;
+  const us=['Instagram','TikTok','Twitter','YouTube'];
+  const uc=(l.platforms||[]).filter(p=>us.some(u=>p.includes(u))).length;
+  s+=uc>=3?20:uc>=2?14:uc>=1?8:0;
+  return s>=75?'A':s>=55?'B':s>=35?'C':'D';
+}
+function addFeed(msg,color){feed.unshift({msg,color:color||'var(--accent)',time:new Date().toLocaleTimeString()});if(feed.length>50)feed.pop();try{localStorage.setItem('ol_feed',JSON.stringify(feed))}catch(e){}}
+function load(){try{const d=localStorage.getItem('ol_leads');leads=d?JSON.parse(d):genDemo();const f=localStorage.getItem('ol_feed');feed=f?JSON.parse(f):[];if(!d)save()}catch(e){leads=genDemo();save()}}
+function save(){try{localStorage.setItem('ol_leads',JSON.stringify(leads))}catch(e){}}
+
+function genDemo(){
+  const d=[
+    {name:"Maria Santos",email:"maria.santos@gmail.com",country:"Philippines",city:"Manila",platforms:["Instagram","TikTok","YouTube","Facebook"],experience:4,english:"Fluent",rate:8,source:"OnlineJobs.ph",status:"Onboarded",notes:"Managed 3 US beauty influencers"},
+    {name:"Chika Obi",email:"chika.obi@yahoo.com",country:"Nigeria",city:"Lagos",platforms:["Instagram","Twitter","TikTok"],experience:3,english:"Fluent",rate:7,source:"LinkedIn",status:"Onboarding",notes:"US lifestyle creator specialist"},
+    {name:"Priya Sharma",email:"priya.sharma@outlook.com",country:"India",city:"Mumbai",platforms:["YouTube","Instagram","Facebook"],experience:5,english:"Fluent",rate:6,source:"Upwork",status:"Interested",notes:"YouTube channel management expert"},
+    {name:"Grace Wanjiku",email:"grace.w@gmail.com",country:"Kenya",city:"Nairobi",platforms:["Instagram","TikTok"],experience:2,english:"Good",rate:5,source:"Facebook Group",status:"Contacted",notes:"Fashion niche portfolio"},
+    {name:"Aisha Mohammed",email:"aisha.m@hotmail.com",country:"Nigeria",city:"Abuja",platforms:["TikTok","Instagram","Twitter","YouTube"],experience:3,english:"Fluent",rate:7,source:"Upwork",status:"Responded",notes:"Strong TikTok growth skills"},
+    {name:"Juan dela Cruz",email:"juan.dc@gmail.com",country:"Philippines",city:"Cebu",platforms:["Facebook","Instagram","YouTube"],experience:6,english:"Fluent",rate:9,source:"Referral",status:"Onboarded",notes:"Full-time VA for US e-commerce brand"},
+    {name:"Fatima Adeyemi",email:"fatima.a@gmail.com",country:"Nigeria",city:"Lagos",platforms:["Instagram","Twitter"],experience:1,english:"Good",rate:4,source:"Facebook Group",status:"New",notes:"Eager learner, basic editing skills"},
+    {name:"Raj Patel",email:"raj.patel@gmail.com",country:"India",city:"Delhi",platforms:["YouTube","Instagram","Facebook","Twitter"],experience:4,english:"Fluent",rate:7,source:"LinkedIn",status:"Interested",notes:"Data-driven content strategist"},
+    {name:"Liza Reyes",email:"liza.r@yahoo.com",country:"Philippines",city:"Davao",platforms:["Instagram","TikTok","Pinterest"],experience:2,english:"Fluent",rate:6,source:"OnlineJobs.ph",status:"Onboarding",notes:"Visual content specialist"},
+    {name:"Kwame Asante",email:"kwame.a@gmail.com",country:"Ghana",city:"Accra",platforms:["Twitter","Instagram"],experience:1,english:"Native",rate:5,source:"Freelancer",status:"Contacted",notes:"Strong English copywriting"},
+    {name:"Sarah Chen",email:"sarah.c@outlook.com",country:"Philippines",city:"Makati",platforms:["Instagram","TikTok","YouTube","Twitter","Facebook"],experience:7,english:"Native",rate:12,source:"LinkedIn",status:"Onboarded",notes:"Agency-level operator, manages 5 creators"},
+    {name:"Emeka Nwosu",email:"emeka.n@gmail.com",country:"Nigeria",city:"Port Harcourt",platforms:["TikTok","Instagram"],experience:2,english:"Good",rate:4,source:"Facebook Group",status:"New",notes:"Fast content editor"},
+    {name:"Ananya Gupta",email:"ananya.g@gmail.com",country:"India",city:"Bangalore",platforms:["Instagram","YouTube"],experience:3,english:"Fluent",rate:6,source:"Upwork",status:"Responded",notes:"Tech creator niche"},
+    {name:"Rose Manalo",email:"rose.m@gmail.com",country:"Philippines",city:"Quezon City",platforms:["Instagram","Facebook","TikTok"],experience:3,english:"Fluent",rate:7,source:"OnlineJobs.ph",status:"Interested",notes:"Consistent content scheduler"},
+    {name:"David Okonkwo",email:"david.ok@yahoo.com",country:"Nigeria",city:"Lagos",platforms:["Twitter","Instagram","YouTube","TikTok"],experience:4,english:"Fluent",rate:8,source:"LinkedIn",status:"Onboarding",notes:"Grew US finance creator 0→50k"},
+    {name:"Amara Singh",email:"amara.s@gmail.com",country:"India",city:"Pune",platforms:["Instagram"],experience:1,english:"Good",rate:3,source:"Freelancer",status:"New",notes:"Entry-level, completed SM course"},
+    {name:"Carlo Bautista",email:"carlo.b@gmail.com",country:"Philippines",city:"Manila",platforms:["TikTok","Instagram","YouTube"],experience:3,english:"Fluent",rate:7,source:"Referral",status:"Onboarded",notes:"Short-form video editing expert"},
+    {name:"Blessing Eze",email:"blessing.e@gmail.com",country:"Nigeria",city:"Enugu",platforms:["Instagram","TikTok"],experience:2,english:"Good",rate:5,source:"Facebook Group",status:"Contacted",notes:"Beauty and skincare niche"},
+    {name:"Tariq Khan",email:"tariq.k@outlook.com",country:"Pakistan",city:"Karachi",platforms:["YouTube","Instagram","Facebook"],experience:3,english:"Good",rate:5,source:"Upwork",status:"Responded",notes:"Video SEO specialist"},
+    {name:"Joy Mendoza",email:"joy.m@gmail.com",country:"Philippines",city:"Pampanga",platforms:["Instagram","TikTok","Facebook","Pinterest"],experience:4,english:"Fluent",rate:8,source:"OnlineJobs.ph",status:"Onboarded",notes:"Multi-platform content manager"},
+    {name:"Samuel Osei",email:"samuel.o@gmail.com",country:"Ghana",city:"Kumasi",platforms:["Twitter","Facebook"],experience:1,english:"Native",rate:4,source:"Freelancer",status:"New",notes:"Community management background"},
+    {name:"Deepa Nair",email:"deepa.n@gmail.com",country:"India",city:"Chennai",platforms:["Instagram","YouTube","TikTok"],experience:2,english:"Fluent",rate:5,source:"LinkedIn",status:"Contacted",notes:"Graphic design + social"},
+    {name:"Miguel Torres",email:"miguel.t@yahoo.com",country:"Philippines",city:"Iloilo",platforms:["YouTube","TikTok"],experience:2,english:"Fluent",rate:6,source:"OnlineJobs.ph",status:"Interested",notes:"Video editing + thumbnails"},
+    {name:"Zainab Bello",email:"zainab.b@gmail.com",country:"Nigeria",city:"Kano",platforms:["Instagram","TikTok","Twitter"],experience:3,english:"Good",rate:6,source:"Upwork",status:"Onboarding",notes:"Grew 3 US fashion accounts"},
+    {name:"Thabo Molefe",email:"thabo.m@outlook.com",country:"South Africa",city:"Johannesburg",platforms:["Instagram","YouTube","Twitter","TikTok"],experience:5,english:"Native",rate:10,source:"LinkedIn",status:"Onboarded",notes:"Managed EU creator expansion to US"}
+  ];
+  addFeed('System initialized with 25 demo leads','var(--blue)');
+  return d.map(x=>({id:gid(),grade:grade(x),addedAt:Date.now()-Math.random()*72*3600000,...x}));
+}
+
+// Nav
+document.querySelectorAll('.sb nav a').forEach(a=>a.addEventListener('click',e=>{
+  e.preventDefault();
+  document.querySelectorAll('.sb nav a').forEach(x=>x.classList.remove('on'));a.classList.add('on');
+  document.querySelectorAll('.pg').forEach(p=>p.classList.remove('on'));
+  document.getElementById('pg-'+a.dataset.pg).classList.add('on');
+  const r={dashboard:renderDash,leads:renderLeads,outreach:renderOu,pipeline:renderPP,community:renderCm};
+  (r[a.dataset.pg]||function(){})();
+}));
+
+function toast(m,ok=true){const t=document.getElementById('toast');t.textContent=m;t.className='toast show '+(ok?'t-ok':'t-err');setTimeout(()=>t.className='toast',2600)}
+function openMo(id){document.getElementById(id).classList.add('show')}
+function closeMo(id){document.getElementById(id).classList.remove('show')}
+
+function updateProgress(){
+  const n=leads.filter(l=>l.status==='Onboarded').length;
+  const pct=Math.min(n/100,1);
+  const circ=138.23;
+  document.getElementById('prog-ring').setAttribute('stroke-dashoffset',circ-(circ*pct));
+  document.getElementById('prog-num').textContent=n;
+}
+
+// Dashboard
+let chSrc,chGr;
+function renderDash(){
+  updateProgress();
+  const t=leads.length,c=leads.filter(l=>l.status!=='New').length;
+  const r=leads.filter(l=>['Responded','Interested','Onboarding','Onboarded'].includes(l.status)).length;
+  const o=leads.filter(l=>l.status==='Onboarded').length;
+  document.getElementById('d-metrics').innerHTML=
+    `<div class="mc mc-blue"><div class="mc-l">Total Leads</div><div class="mc-v">${t}</div><div class="mc-s">From ${new Set(leads.map(l=>l.source)).size} sources</div></div>`+
+    `<div class="mc mc-orange"><div class="mc-l">Contacted</div><div class="mc-v">${c}</div><div class="mc-s">${t?Math.round(c/t*100):0}% reach rate</div></div>`+
+    `<div class="mc mc-yellow"><div class="mc-l">Responded</div><div class="mc-v">${r}</div><div class="mc-s">${c?Math.round(r/c*100):0}% reply rate</div></div>`+
+    `<div class="mc mc-green"><div class="mc-l">Onboarded</div><div class="mc-v">${o}</div><div class="mc-s">${o}% of 100 target</div></div>`;
+  // Funnel
+  const stages=ST.map(s=>({l:s,c:leads.filter(x=>x.status===s).length}));
+  const mx=Math.max(...stages.map(s=>s.c),1);
+  document.getElementById('d-funnel').innerHTML='<div class="fn">'+stages.map(s=>`<div class="fn-s"><div class="fn-l">${s.l}</div><div class="fn-bw"><div class="fn-b" style="width:${Math.max(Math.round(s.c/mx*100),6)}%;background:${ST_C[s.l]}">${s.c}</div></div></div>`).join('')+'</div>';
+  // Feed
+  document.getElementById('d-feed').innerHTML=feed.length?feed.slice(0,20).map(f=>`<div class="feed-i"><div class="feed-dot" style="background:${f.color}"></div><div><div>${f.msg}</div><div class="feed-t">${f.time}</div></div></div>`).join(''):'<p style="color:var(--text3);font-size:13px">No activity yet.</p>';
+  // Charts
+  const txtC=getComputedStyle(document.documentElement).getPropertyValue('--text2').trim();
+  const borC=getComputedStyle(document.documentElement).getPropertyValue('--border').trim();
+  const sources={};leads.forEach(l=>sources[l.source]=(sources[l.source]||0)+1);
+  if(chSrc)chSrc.destroy();
+  chSrc=new Chart(document.getElementById('ch-src'),{type:'doughnut',data:{labels:Object.keys(sources),datasets:[{data:Object.values(sources),backgroundColor:['#635bff','#2f80ed','#00c48c','#ffb020','#ff7b47','#ff4757'],borderWidth:0}]},options:{responsive:true,cutout:'60%',plugins:{legend:{position:'bottom',labels:{font:{size:11,family:'Inter'},padding:10,usePointStyle:true,pointStyleWidth:8,color:txtC}}}}});
+  // Grade × Region stacked
+  const countries=[...new Set(leads.map(l=>l.country))].sort();
+  const gradeData={A:[],B:[],C:[],D:[]};
+  countries.forEach(c=>{const cl=leads.filter(l=>l.country===c);['A','B','C','D'].forEach(g=>gradeData[g].push(cl.filter(l=>l.grade===g).length))});
+  if(chGr)chGr.destroy();
+  chGr=new Chart(document.getElementById('ch-gr'),{type:'bar',data:{labels:countries,datasets:[
+    {label:'A',data:gradeData.A,backgroundColor:'#00c48c',borderRadius:4},{label:'B',data:gradeData.B,backgroundColor:'#2f80ed',borderRadius:4},
+    {label:'C',data:gradeData.C,backgroundColor:'#ffb020',borderRadius:4},{label:'D',data:gradeData.D,backgroundColor:'#ff4757',borderRadius:4}
+  ]},options:{responsive:true,plugins:{legend:{labels:{font:{size:11,family:'Inter'},usePointStyle:true,pointStyleWidth:8,color:txtC}}},scales:{x:{stacked:true,ticks:{font:{size:11},color:txtC},grid:{display:false}},y:{stacked:true,beginAtZero:true,ticks:{font:{size:11},color:txtC},grid:{color:borC}}}}});
+}
+
+// Leads
+function getFiltered(){
+  let f=[...leads];
+  const q=(document.getElementById('l-search').value||'').toLowerCase();
+  const g=document.getElementById('f-grade').value,s=document.getElementById('f-src').value,st=document.getElementById('f-st').value;
+  if(q)f=f.filter(l=>(l.name+l.email).toLowerCase().includes(q));
+  if(g)f=f.filter(l=>l.grade===g);if(s)f=f.filter(l=>l.source===s);if(st)f=f.filter(l=>l.status===st);
+  return f;
+}
+function renderLeads(){
+  const f=getFiltered();selected.clear();updateBatchBtn();
+  document.getElementById('l-cnt').textContent=`${f.length} of ${leads.length} leads`;
+  document.getElementById('ck-all').checked=false;
+  document.getElementById('l-tbody').innerHTML=f.map(l=>`<tr>
+    <td><input type="checkbox" class="ck l-ck" data-id="${l.id}" onchange="onCheck()"></td>
+    <td><div class="t-name">${esc(l.name)}</div><div class="t-email">${esc(l.email)}</div></td>
+    <td style="font-size:12px">${esc(l.city)}, ${esc(l.country)}</td>
+    <td>${(l.platforms||[]).map(p=>`<span class="bg bg-new" style="margin:1px;font-size:10px">${esc(p)}</span>`).join(' ')}</td>
+    <td>${l.experience}y</td><td style="font-size:12px">${esc(l.english)}</td>
+    <td><span class="bg bg-${l.grade.toLowerCase()}">${l.grade}</span></td>
+    <td><span class="bg bg-st bg-${l.status.toLowerCase()}">${l.status}</span></td>
+    <td style="font-size:12px">${esc(l.source)}</td>
+    <td><button class="btn btn-s btn-o" onclick="openDet('${l.id}')">View</button></td>
+  </tr>`).join('');
+}
+function filterL(){renderLeads()}
+function toggleAll(){const c=document.getElementById('ck-all').checked;document.querySelectorAll('.l-ck').forEach(x=>{x.checked=c;c?selected.add(x.dataset.id):selected.delete(x.dataset.id)});updateBatchBtn()}
+function onCheck(){selected.clear();document.querySelectorAll('.l-ck:checked').forEach(x=>selected.add(x.dataset.id));updateBatchBtn()}
+function updateBatchBtn(){document.getElementById('batch-btn').style.display=selected.size>0?'inline-flex':'none';document.getElementById('batch-btn').textContent=`Batch Update (${selected.size})`}
+function openBatch(){document.getElementById('batch-cnt').textContent=selected.size;openMo('mo-batch')}
+function doBatch(){
+  const st=document.getElementById('batch-st').value;
+  if(st){let n=0;selected.forEach(id=>{const l=leads.find(x=>x.id===id);if(l){l.status=st;n++}});save();addFeed(`Batch updated ${n} leads → ${st}`,'var(--orange)');toast(`${n} leads moved to ${st}`)}
+  closeMo('mo-batch');selected.clear();renderLeads();
+}
+
+// Add
+function openAddModal(){openMo('mo-add')}
+function addLead(){
+  const name=document.getElementById('f-name').value.trim(),email=document.getElementById('f-email').value.trim();
+  if(!name||!email){toast('Name and email required',false);return}
+  if(leads.find(l=>l.email.toLowerCase()===email.toLowerCase())){toast('Duplicate: this email already exists',false);return}
+  const l={id:gid(),name,email,country:document.getElementById('f-country').value,city:document.getElementById('f-city').value.trim()||'Unknown',
+    platforms:document.getElementById('f-plat').value.split(',').map(p=>p.trim()).filter(Boolean),
+    experience:parseInt(document.getElementById('f-exp').value)||0,english:document.getElementById('f-eng').value,
+    rate:parseFloat(document.getElementById('f-rate').value)||0,source:document.getElementById('f-source').value,
+    status:'New',notes:document.getElementById('f-notes').value.trim(),addedAt:Date.now()};
+  l.grade=grade(l);leads.unshift(l);save();closeMo('mo-add');renderLeads();updateProgress();
+  addFeed(`Added lead: ${name} (${l.grade})`,'var(--green)');toast('Lead added: '+name);
+  ['f-name','f-email','f-city','f-plat','f-notes'].forEach(id=>document.getElementById(id).value='');
+}
+
+// CSV
+function handleCSV(e){
+  const file=e.target.files[0];if(!file)return;
+  const reader=new FileReader();
+  reader.onload=function(ev){
+    const lines=ev.target.result.split('\n').filter(l=>l.trim());
+    if(lines.length<2){toast('Invalid CSV',false);return}
+    const hd=lines[0].split(',').map(h=>h.trim().toLowerCase().replace(/['"]/g,''));
+    let imp=0,dup=0;
+    for(let i=1;i<lines.length;i++){
+      const vals=lines[i].split(',').map(v=>v.trim().replace(/['"]/g,''));
+      const row={};hd.forEach((h,j)=>row[h]=vals[j]||'');
+      const em=(row.email||'').toLowerCase();
+      if(!em||leads.find(l=>l.email.toLowerCase()===em)){dup++;continue}
+      const l={id:gid(),name:row.name||'Unknown',email:em,country:row.country||'Unknown',city:row.city||'Unknown',
+        platforms:(row.platforms||'').split(/[;|]/).map(p=>p.trim()).filter(Boolean),
+        experience:parseInt(row.experience)||0,english:row.english||'Good',rate:parseFloat(row.rate)||0,
+        source:row.source||'CSV Import',status:'New',notes:row.notes||'',addedAt:Date.now()};
+      l.grade=grade(l);leads.push(l);imp++;
+    }
+    save();renderLeads();updateProgress();
+    addFeed(`CSV import: ${imp} new, ${dup} duplicates skipped`,'var(--blue)');
+    toast(`Imported ${imp} leads, ${dup} duplicates skipped`);
+  };reader.readAsText(file);e.target.value='';
+}
+
+// Export
+function exportCSV(){
+  const hd='name,email,country,city,platforms,experience,english,rate,source,status,grade,notes\n';
+  const rows=leads.map(l=>[l.name,l.email,l.country,l.city,(l.platforms||[]).join('|'),l.experience,l.english,l.rate,l.source,l.status,l.grade,`"${(l.notes||'').replace(/"/g,'""')}"`].join(',')).join('\n');
+  const blob=new Blob([hd+rows],{type:'text/csv'});
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='onely_leads_export.csv';a.click();
+  toast('CSV exported');
+}
+
+// Detail
+function openDet(id){
+  const l=leads.find(x=>x.id===id);if(!l)return;
+  document.getElementById('det-title').textContent=l.name;
+  document.getElementById('det-body').innerHTML=`
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;font-size:13px">
+      <div><label>Email</label><div style="font-weight:600">${esc(l.email)}</div></div>
+      <div><label>Location</label><div style="font-weight:600">${esc(l.city)}, ${esc(l.country)}</div></div>
+      <div><label>Platforms</label><div>${(l.platforms||[]).join(', ')}</div></div>
+      <div><label>Experience</label><div>${l.experience} years · $${l.rate}/hr</div></div>
+      <div><label>English</label><div>${esc(l.english)}</div></div>
+      <div><label>Grade</label><div><span class="bg bg-${l.grade.toLowerCase()}">${l.grade}</span></div></div>
+    </div>
+    <label>Status</label>
+    <select id="det-st" style="width:100%;padding:8px;border:1px solid var(--border);border-radius:8px;font-size:13px;background:var(--surface);color:var(--text)">
+      ${ST.map(s=>`<option${s===l.status?' selected':''}>${s}</option>`).join('')}</select>
+    <label>Notes</label>
+    <textarea id="det-notes" style="width:100%;padding:8px;border:1px solid var(--border);border-radius:8px;font-size:13px;min-height:60px;background:var(--surface);color:var(--text)">${esc(l.notes||'')}</textarea>`;
+  document.getElementById('det-foot').innerHTML=`
+    <button class="btn btn-d btn-s" onclick="delLead('${l.id}')">Delete</button>
+    <button class="btn btn-o" onclick="closeMo('mo-det')">Cancel</button>
+    <button class="btn btn-p" onclick="saveLead('${l.id}')">Save</button>`;
+  openMo('mo-det');
+}
+function saveLead(id){const l=leads.find(x=>x.id===id);if(!l)return;const old=l.status;l.status=document.getElementById('det-st').value;l.notes=document.getElementById('det-notes').value;save();closeMo('mo-det');renderLeads();updateProgress();if(old!==l.status)addFeed(`${l.name}: ${old} → ${l.status}`,ST_C[l.status]);toast('Lead updated')}
+function delLead(id){const l=leads.find(x=>x.id===id);leads=leads.filter(x=>x.id!==id);save();closeMo('mo-det');renderLeads();updateProgress();addFeed(`Deleted: ${l?.name||'Unknown'}`,'var(--red)');toast('Lead deleted')}
+
+// Outreach
+let selOu=null;
+function renderOu(){
+  const list=leads.filter(l=>l.status==='New'||l.status==='Contacted');
+  document.getElementById('ou-lp').innerHTML=list.length?list.map(l=>`<div class="lp-i${selOu===l.id?' sel':''}" onclick="pickOu('${l.id}')"><div class="lp-n">${esc(l.name)} <span class="bg bg-${l.grade.toLowerCase()}" style="font-size:9px">${l.grade}</span></div><div class="lp-s">${esc(l.country)} · ${(l.platforms||[]).slice(0,2).join(', ')}</div></div>`).join(''):'<p style="padding:20px;color:var(--text3);font-size:13px">All leads have been contacted.</p>';
+  updateOuStats();
+  if(sampleFn)document.getElementById('ai-btn').style.display='inline-flex';
+}
+function pickOu(id){selOu=id;renderOu();renderOuMsg()}
+function renderOuMsg(){
+  const box=document.getElementById('ou-msg');
+  if(!selOu){box.textContent='Select a lead to generate a message.';box.classList.remove('loading');return}
+  const l=leads.find(x=>x.id===selOu);if(!l){box.textContent='Lead not found.';return}
+  box.classList.remove('loading');box.textContent=tplMsg(l,document.getElementById('ou-ch').value,document.getElementById('ou-tone').value);
+}
+function tplMsg(l,ch,tone){
+  const fn=l.name.split(' ')[0],pl=(l.platforms||[]).join(', ');
+  const t={professional:{g:'Hi',c:'Looking forward to hearing from you.'},friendly:{g:'Hey',c:'Would love to chat more! 😊'},urgent:{g:'Hi',c:'Spots are limited — reply today to secure yours.'}}[tone];
+  const tpls={
+    linkedin:`${t.g} ${fn},\n\nI came across your profile and was impressed by your ${l.experience}+ years managing ${pl} for international creators.\n\nWe're building Onely — an AI-powered platform helping creators scale their businesses. We're looking for experienced operators like you to join our paid operator network.\n\nWhat you'd do:\n• Manage content publishing and fan engagement for US-based creators\n• Use AI tools to streamline your workflow — less manual work, more strategy\n• Earn $${Math.max(l.rate,5)}-${l.rate+5}/hr with flexible hours from ${l.city}\n\nYour ${l.english.toLowerCase()} English and ${pl} expertise is exactly what we need.\n\n${t.c}\n\n— Onely Recruitment`,
+    email:`Subject: Remote Operator Role — Onely Platform (Flexible, Paid)\n\n${t.g} ${fn},\n\nI found your profile on ${l.source} and wanted to reach out about a remote opportunity.\n\nOnely (onely.cc) is an AI-powered creator business platform. We're recruiting social media operators — people who manage Instagram, TikTok, YouTube for US/EU creators — to join our operator network.\n\nWhy operators choose Onely:\n• AI handles repetitive content tasks — you focus on strategy\n• Flexible schedule, work from ${l.city}\n• $${Math.max(l.rate,5)}-${l.rate+5}/hr based on experience\n• Grow into team lead roles as we scale\n\nWith ${l.experience} years managing ${pl}, you'd be a strong fit.\n\nInterested? Reply to this email or join our Discord community.\n\n${t.c}\n\nOnely Recruitment Team\nonely.cc`,
+    discord:`${t.g} ${fn}! 👋\n\nWelcome to the Onely operator community! Your background in ${pl} management caught our eye.\n\nOnely is an AI-powered platform helping creators run their entire business. We need operators like you to help our creators succeed.\n\nWhat's in it for you:\n🎯 Remote from ${l.city}, your schedule\n🤖 AI tools that cut workload in half\n💰 $${Math.max(l.rate,5)}-${l.rate+5}/hr for your ${l.experience} years of experience\n📈 Growth path: Operator → Lead → Regional Manager\n\nDrop a ✅ in #onboarding to get started!\n\n${t.c}`,
+    telegram:`${t.g} ${fn}!\n\nI'm from the Onely team — an AI-powered creator platform recruiting experienced social media operators.\n\nYour ${l.experience} years managing ${pl} is exactly what we're looking for.\n\nThe role:\n→ Help US creators manage social presence\n→ AI tools handle the grunt work\n→ Flexible, remote from ${l.city}\n→ $${Math.max(l.rate,5)}-${l.rate+5}/hr\n\nWant details? I can get you started today.\n\n${t.c}`};
+  return tpls[ch]||'Template not found.';
+}
+async function aiGenerate(){
+  if(!sampleFn||!selOu)return;
+  const l=leads.find(x=>x.id===selOu);if(!l)return;
+  const box=document.getElementById('ou-msg');
+  const ch=document.getElementById('ou-ch').value,tone=document.getElementById('ou-tone').value;
+  box.textContent='Generating with AI…';box.classList.add('loading');
+  try{
+    const prompt=`You are a recruitment specialist for Onely, an AI-powered creator business platform. Write a ${tone} ${ch} outreach message to recruit this person as a paid social media operator:
+
+Name: ${l.name}
+Location: ${l.city}, ${l.country}
+Experience: ${l.experience} years
+Platforms: ${(l.platforms||[]).join(', ')}
+English: ${l.english}
+Current rate: $${l.rate}/hr
+Background: ${l.notes||'N/A'}
+
+The message should:
+- Be personalized to their specific experience
+- Explain Onely's value proposition (AI-powered creator platform)
+- Highlight benefits: flexible remote work, AI tools reduce manual work, competitive pay ($${Math.max(l.rate,5)}-${l.rate+5}/hr)
+- Include a clear call to action
+- Be ${ch==='telegram'?'concise':'moderate length'}
+- Tone: ${tone}
+${ch==='email'?'- Start with a subject line':''}
+
+Write ONLY the message, no explanations.`;
+    await sampleFn(prompt,{onText:({text})=>{box.textContent=text;box.classList.remove('loading')}});
+  }catch(e){box.classList.remove('loading');box.textContent=tplMsg(l,ch,tone);toast('AI unavailable, using template',false)}
+}
+function copyMsg(){navigator.clipboard.writeText(document.getElementById('ou-msg').textContent).then(()=>toast('Copied to clipboard'))}
+function markSent(){
+  if(!selOu)return;const l=leads.find(x=>x.id===selOu);if(!l)return;
+  if(l.status==='New'){l.status='Contacted';save();addFeed(`Outreach sent to ${l.name}`,'var(--blue)');toast(`${l.name} marked as Contacted`);renderOu();updateProgress()}
+  else toast(`${l.name} was already contacted`);
+}
+function updateOuStats(){
+  const c=leads.filter(l=>l.status!=='New').length;
+  const r=leads.filter(l=>['Responded','Interested','Onboarding','Onboarded'].includes(l.status)).length;
+  document.getElementById('s-sent').textContent=c;document.getElementById('s-rep').textContent=r;
+  document.getElementById('s-rate').textContent=c?Math.round(r/c*100)+'%':'0%';
+}
+
+// Pipeline
+function renderPP(){
+  document.getElementById('pp-board').innerHTML=ST.map(s=>{
+    const sl=leads.filter(l=>l.status===s);const nx=ST[ST.indexOf(s)+1];
+    return`<div class="pp-col"><div class="pp-col-h"><span>${s}</span><span class="cnt">${sl.length}</span></div>${sl.map(l=>`<div class="pp-cd" onclick="openDet('${l.id}')"><div class="pp-n">${esc(l.name)}</div><div class="pp-m">${esc(l.country)} · <span class="bg bg-${l.grade.toLowerCase()}" style="font-size:9px">${l.grade}</span></div>${nx?`<div class="pp-a"><button class="btn btn-s btn-o" onclick="event.stopPropagation();mvStage('${l.id}','${nx}')">→ ${nx}</button></div>`:''}</div>`).join('')}</div>`;
+  }).join('');
+}
+function mvStage(id,s){const l=leads.find(x=>x.id===id);if(!l)return;const old=l.status;l.status=s;save();renderPP();updateProgress();addFeed(`${l.name}: ${old} → ${s}`,ST_C[s]);toast(`${l.name} → ${s}`)}
+
+// Community
+function renderCm(){
+  const onb=leads.filter(l=>l.status==='Onboarded').length;
+  const obing=leads.filter(l=>l.status==='Onboarding').length;
+  const discord=[
+    {icon:'#',name:'welcome',desc:'Introductions & onboarding bot',count:onb+obing},
+    {icon:'📢',name:'announcements',desc:'Platform updates & new creator matches',count:'-'},
+    {icon:'💬',name:'general-chat',desc:'Daily operator discussions',count:Math.round(onb*0.7)},
+    {icon:'📚',name:'training',desc:'Tutorials, guides, FAQ',count:Math.round(onb*0.5)},
+    {icon:'📸',name:'instagram-tips',desc:'IG-specific strategies & tools',count:Math.round(onb*0.6)},
+    {icon:'🎬',name:'tiktok-tips',desc:'TikTok growth & editing',count:Math.round(onb*0.5)},
+    {icon:'🏆',name:'showcase',desc:'Operator wins & milestones',count:Math.round(onb*0.3)},
+    {icon:'🔗',name:'referrals',desc:'Invite friends, earn $5/person',count:Math.round(onb*0.4)},
+  ];
+  document.getElementById('cm-discord').innerHTML=discord.map(c=>`<div class="cm-ch"><div class="cm-icon discord">${c.icon}</div><div class="cm-info"><div class="ch-name">#${c.name}</div><div class="ch-desc">${c.desc}</div></div><div class="ch-count">${c.count}</div></div>`).join('');
+  const tg=[
+    {name:'Onely Operators — Main',desc:'All operators, announcements + chat',count:onb+obing},
+    {name:'Onely — Philippines',desc:'PH operators, local tips & meetups',count:leads.filter(l=>l.country==='Philippines'&&['Onboarding','Onboarded'].includes(l.status)).length},
+    {name:'Onely — Nigeria',desc:'NG operators, local community',count:leads.filter(l=>l.country==='Nigeria'&&['Onboarding','Onboarded'].includes(l.status)).length},
+    {name:'Onely — Support',desc:'Technical issues & payment help',count:Math.round(onb*0.3)},
+  ];
+  document.getElementById('cm-tg').innerHTML=tg.map(c=>`<div class="cm-ch"><div class="cm-icon tg">✈</div><div class="cm-info"><div class="ch-name">${c.name}</div><div class="ch-desc">${c.desc}</div></div><div class="ch-count">${c.count}</div></div>`).join('');
+
+  document.getElementById('cm-training').innerHTML=`
+    <div style="font-size:13px">
+      <div style="display:flex;justify-content:space-between;margin-bottom:10px"><span>Day 0: Platform Onboarding</span><span style="color:var(--green);font-weight:600">${onb > 0 ? Math.min(Math.round(onb*0.9),onb) : 0}/${onb} complete</span></div>
+      <div style="height:6px;background:var(--bg);border-radius:3px;margin-bottom:16px;overflow:hidden"><div style="height:100%;width:${onb>0?Math.round(Math.min(onb*0.9,onb)/onb*100):0}%;background:var(--green);border-radius:3px"></div></div>
+      <div style="display:flex;justify-content:space-between;margin-bottom:10px"><span>Week 1: Creator Communication</span><span style="color:var(--yellow);font-weight:600">${Math.round(onb*0.5)}/${onb} complete</span></div>
+      <div style="height:6px;background:var(--bg);border-radius:3px;margin-bottom:16px;overflow:hidden"><div style="height:100%;width:50%;background:var(--yellow);border-radius:3px"></div></div>
+      <div style="display:flex;justify-content:space-between;margin-bottom:10px"><span>Week 2: Advanced AI Tools</span><span style="color:var(--text3);font-weight:600">0/${onb} complete</span></div>
+      <div style="height:6px;background:var(--bg);border-radius:3px;overflow:hidden"><div style="height:100%;width:0%;background:var(--accent);border-radius:3px"></div></div>
+    </div>`;
+  
+  document.getElementById('cm-retention').innerHTML=`
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;text-align:center">
+      <div><div style="font-size:28px;font-weight:800;color:var(--green)">${onb}</div><div style="font-size:11.5px;color:var(--text2);margin-top:2px">Active Operators</div></div>
+      <div><div style="font-size:28px;font-weight:800;color:var(--accent)">${obing}</div><div style="font-size:11.5px;color:var(--text2);margin-top:2px">In Onboarding</div></div>
+      <div><div style="font-size:28px;font-weight:800;color:var(--yellow)">${Math.round(onb*0.85)}%</div><div style="font-size:11.5px;color:var(--text2);margin-top:2px">7-Day Retention</div></div>
+      <div><div style="font-size:28px;font-weight:800;color:var(--blue)">${Math.round(onb*0.4)}</div><div style="font-size:11.5px;color:var(--text2);margin-top:2px">Referrals Generated</div></div>
+    </div>`;
+}
+
+// Init
+load();
+
+// Try to connect AI sample capability
+(async()=>{
+  try{
+    if(window.claude&&window.claude.use){
+      const s=await window.claude.use('sample');
+      if(s){sampleFn=s;document.getElementById('ai-btn').style.display='inline-flex'}
+    }
+  }catch(e){}
+})();
+
+renderDash();
+</script>
+</body>
+</html>
